@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vivavoce
+      POSTGRES_USER: vivauser
+      POSTGRES_PASSWORD: vivapass
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://vivauser:vivapass@postgres:5432/vivavoce
+      JWT_SECRET: dev-secret-change-in-production
+      ADMIN_PASSWORD: admin123
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      NODE_ENV: development
+      PORT: 3000
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: frontend
+    restart: unless-stopped
+    ports:
+      - '5173:5173'
+    environment:
+      VITE_API_URL: http://localhost:3000
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+
+volumes:
+  pgdata:
