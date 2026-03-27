@@ -22,7 +22,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Serve static frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const publicPath = path.join(__dirname, '../../public');
+  const publicPath = path.join(__dirname, '../public');
   app.use(express.static(publicPath));
 }
 
@@ -38,7 +38,7 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(__dirname, '../../public/index.html'));
+      res.sendFile(path.join(__dirname, '../public/index.html'));
     }
   });
 }
